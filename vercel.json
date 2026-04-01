@@ -1,0 +1,5 @@
+{
+  "installCommand": "npm install --prefix ctrl-sync-site",
+  "buildCommand": "npm run build --prefix ctrl-sync-site",
+  "outputDirectory": "ctrl-sync-site/dist"
+}
