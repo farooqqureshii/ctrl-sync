@@ -102,8 +102,8 @@ function ModelScene({ url }: { url: string }) {
         makeDefault
         enablePan={false}
         minDistance={0.15}
-        minPolarAngle={0.35}
-        maxPolarAngle={Math.PI / 1.9}
+        minPolarAngle={0}
+        maxPolarAngle={Math.PI}
       />
     </Canvas>
   )
