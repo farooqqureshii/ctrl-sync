@@ -1,4 +1,10 @@
-import { useRef, useState, useLayoutEffect, useCallback } from "react"
+import {
+  useRef,
+  useState,
+  useLayoutEffect,
+  useCallback,
+  useMemo,
+} from "react"
 import {
   motion,
   useScroll,
@@ -110,20 +116,38 @@ function GridPlus({ c, s, rot }: { c: string; s: number; rot: number }) {
   )
 }
 
+const HERO_MOBILE_MQ = "(max-width: 640px)"
+
 export function ScrollHero() {
   const ref = useRef<HTMLElement>(null)
   const [phase, setPhase] = useState(0)
+  const [heroScrollCompact, setHeroScrollCompact] = useState(() =>
+    typeof window !== "undefined" &&
+    window.matchMedia(HERO_MOBILE_MQ).matches,
+  )
+
+  useLayoutEffect(() => {
+    const mq = window.matchMedia(HERO_MOBILE_MQ)
+    const sync = () => setHeroScrollCompact(mq.matches)
+    sync()
+    mq.addEventListener("change", sync)
+    return () => mq.removeEventListener("change", sync)
+  }, [])
 
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end end"],
   })
 
-  const smooth = useSpring(scrollYProgress, {
-    stiffness: 420,
-    damping: 44,
-    mass: 0.18,
-  })
+  const springOpts = useMemo(
+    () =>
+      heroScrollCompact
+        ? { stiffness: 820, damping: 50, mass: 0.12 }
+        : { stiffness: 420, damping: 44, mass: 0.18 },
+    [heroScrollCompact],
+  )
+
+  const smooth = useSpring(scrollYProgress, springOpts)
 
   const heroDrive = useTransform(smooth, compressHeroProgress)
 
@@ -1080,6 +1104,9 @@ export function ScrollHero() {
           text-align: center;
         }
         @media (max-width: 640px) {
+          .scroll-hero {
+            height: 280vh;
+          }
           .scroll-hero__content {
             padding: clamp(1.5rem, 6vw, 2.75rem) var(--page-pad);
           }
